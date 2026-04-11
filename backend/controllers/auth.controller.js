@@ -7,7 +7,7 @@ export const signup = async (req, res) => {
         const { fullName, email, password, mobileNumber, role } = req.body;
 
         if (!fullName || !email || !password || !mobileNumber || !role) {
-            return res.status(400).json({ message: "Provide All Details." });
+            return res.status(400).json({ message: "Fill All Details." });
         }
         const user = await User.findOne({ email });
         if (user) {
@@ -52,3 +52,46 @@ export const signup = async (req, res) => {
         return res.status(500).json({ message: `Sign Up Error: ${error}` });
     }
 }
+
+export const signIn = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "All fields are Required " });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not Exist" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid Password" });
+        }
+
+        const token = await getToken(user._id);
+
+        res.cookie("token", token, {
+            secure: false,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+        })
+
+        return res.status(200).json({
+            message: "Login Successful",
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+            }
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: `Sign In Error: ${error}` });
+    }
+}
+
