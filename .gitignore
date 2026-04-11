@@ -1,0 +1,107 @@
+# =========================
+# Node.js / Backend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build files
+dist/
+build/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# =========================
+# React / Frontend
+# =========================
+/frontend/node_modules
+/frontend/build
+
+# Next.js (if used)
+.next/
+
+# Vite
+dist/
+.vite/
+
+# =========================
+# MongoDB
+# =========================
+data/
+*.mongodb
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Testing
+# =========================
+coverage/
+
+# =========================
+# Misc
+# =========================
+*.tgz
+*.tar.gz
+
+# =========================
+# Docker
+# =========================
+.dockerignore
+
+# =========================
+# TypeScript (if used)
+# =========================
+*.tsbuildinfo
+
+# =========================
+# Firebase (if used)
+# =========================
+.firebase/
+firebase-debug.log
+
+# =========================
+# Heroku / Deployment
+# =========================
+.heroku/
+
+# =========================
+# Optional lock files (uncomment if needed)
+# =========================
+# package-lock.json
+# yarn.lock
