@@ -1,5 +1,5 @@
 import getToken from "../config/token.js";
-import { User } from "../models/user.model.js"
+import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 
 export const signup = async (req, res) => {
@@ -12,7 +12,7 @@ export const signup = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ message: "User Already Exist with this Email" });
-        }
+        }   
         if (password.length < 6) {
             return res.status(400).json({ message: "Password must be at least 6 Characters" });
         }
@@ -22,7 +22,7 @@ export const signup = async (req, res) => {
         const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        user = await User.create({
+        const newUser = await User.create({
             fullName,
             email,
             password: hashedPassword,
@@ -30,7 +30,7 @@ export const signup = async (req, res) => {
             role,
         });
 
-        const token = await getToken(user._id);
+        const token = await getToken(newUser._id);
 
         res.cookie("token", token, {
             secure: false,
@@ -41,10 +41,10 @@ export const signup = async (req, res) => {
 
         return res.status(201).json({
             message: "User Created Successfully",
-            user: {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
+            newUser: {
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
             }
         })
 
