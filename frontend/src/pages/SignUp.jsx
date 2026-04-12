@@ -38,10 +38,19 @@ function SignUp() {
 
     return (
         <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
-            <div className={
+            {/* <div className={
                 `bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px]`} style={{
                     border: `1px solid ${borderColor}`
-                }}>
+                }}> */}
+            <form
+                action=""
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSignUp();
+                }}
+                className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px]`}
+                style={{ border: `1px solid ${borderColor}` }}
+            >
                 <h1
                     className={`text-3xl font-bold mb-2 text-[${primaryColor}]`}
                     style={{ color: primaryColor }}>Zestio</h1>
@@ -141,8 +150,11 @@ function SignUp() {
                     </div>
                 </div>
                 <button
+                    type="submit"
                     className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
-                    onClick={handleSignUp}>Sign Up</button>
+                >
+                    Sign Up
+                </button>
 
                 <button
                     className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'>
@@ -156,9 +168,9 @@ function SignUp() {
                         onClick={() => navigate("/signin")}>Sign In
                     </span>
                 </p>
-            </div>
+            </form>
         </div >
     )
 }
 
-export default SignUp
+export default SignUp;

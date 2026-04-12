@@ -43,10 +43,14 @@ function SignIn() {
 
     return (
         <div className='min-h-screen w-full flex items-center justify-center p-4' style={{ backgroundColor: bgColor }}>
-            <div className={
-                `bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px]`} style={{
-                    border: `1px solid ${borderColor}`
-                }}>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSignIn();
+                }}
+                className="bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px]"
+                style={{ border: `1px solid ${borderColor}` }}
+            >
                 <h1
                     className={`text-3xl font-bold mb-2 text-[${primaryColor}]`}
                     style={{ color: primaryColor }}>Zestio</h1>
@@ -97,10 +101,12 @@ function SignIn() {
                     onClick={() => navigate("/forgot-password")}>
                     Forgot Password
                 </div>
-
                 <button
+                    type="submit"
                     className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
-                    onClick={handleSignIn}>Sign In</button>
+                >
+                    Sign In
+                </button>
 
                 <button
                     className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'>
@@ -114,7 +120,7 @@ function SignIn() {
                         onClick={() => navigate("/signup")}>Sign Up
                     </span>
                 </p>
-            </div>
+            </form>
         </div >
     )
 }
