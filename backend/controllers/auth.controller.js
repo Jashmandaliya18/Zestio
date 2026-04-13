@@ -1,5 +1,6 @@
 import getToken from "../config/token.js";
 import User from "../models/user.model.js"
+import { sendOTPMail } from "../config/mail.js"
 import bcrypt from "bcryptjs"
 
 export const signup = async (req, res) => {
@@ -12,7 +13,7 @@ export const signup = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ message: "User Already Exist with this Email" });
-        }   
+        }
         if (password.length < 6) {
             return res.status(400).json({ message: "Password must be at least 6 Characters" });
         }
@@ -105,3 +106,74 @@ export const signOut = async (req, res) => {
     }
 }
 
+export const sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not Exist" });
+        }
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        user.resetOtp = otp;
+        user.otpExpires = Date.now() + 2 * 60 * 1000;
+        user.isOtpVerify = false;
+        await user.save();
+
+        await sendOTPMail(user.email, otp);
+
+        return res.status(200).json({ message: "OTP sent to your email" });
+
+    } catch (error) {
+        return res.status(500).json(`Send OTP error ${error}`);
+    }
+}
+
+export const verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist" });
+        }
+        if (user.resetOtp != otp) {
+            return res.status(400).json({ message: "OTP Invalid" });
+        }
+        if (user.otpExpires < Data.now()) {
+            return res.status(400).json({ message: "OTP Expired" });
+        }
+        user.isOtpVerify = true;
+        user.resetOtp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
+        return res.status(200).json({ message: "OTP Verifu Successfully" });
+
+    } catch (error) {
+        return res.status(500).json(`Verify OTP error ${error}`);
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User does not Exist" });
+        }
+        if (!user.isOtpVerify) {
+            return res.status(400).json({ message: "OTP Verification Required" });
+        }
+        const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+        user.password = hashedPassword;
+
+        user.isOtpVerify = false;
+
+        await user.save();
+    } catch (error) {
+        return res.status(500).json(`Reset Password error ${error}`);
+    }
+}
