@@ -134,6 +134,9 @@ export const sendOTP = async (req, res) => {
 export const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
+        if (!email || !otp) {
+            return res.status(400).json({ message: "Email and OTP are required" });
+        }
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "User does not exist" });
@@ -141,7 +144,7 @@ export const verifyOTP = async (req, res) => {
         if (user.resetOtp != otp) {
             return res.status(400).json({ message: "OTP Invalid" });
         }
-        if (user.otpExpires < Data.now()) {
+        if (user.otpExpires < Date.now()) {
             return res.status(400).json({ message: "OTP Expired" });
         }
         user.isOtpVerify = true;
@@ -173,6 +176,7 @@ export const resetPassword = async (req, res) => {
         user.isOtpVerify = false;
 
         await user.save();
+        return res.status(200).json({ message: "Password Reset Successfully" });
     } catch (error) {
         return res.status(500).json(`Reset Password error ${error}`);
     }
