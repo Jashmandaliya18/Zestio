@@ -5,6 +5,9 @@ import { FcGoogle } from "react-icons/fc"; // Google
 import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 import { serverUrl } from '../App';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../utils/firebase.js';
+import { ClipLoader } from "react-spinners"
 
 function SignUp() {
 
@@ -20,8 +23,11 @@ function SignUp() {
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
     const [password, setPassword] = useState("");
+    const [err, setErr] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSignUp = async () => {
+        setLoading(true);
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signup`, {
                 fullName,
@@ -30,10 +36,42 @@ function SignUp() {
                 mobileNumber: mobile,
                 role
             }, { withCredentials: true })
+            setErr("");
+            setLoading(false);
+            navigate("/signin");
             console.log(result);
         } catch (error) {
+            setLoading(false);
             console.log(error.response.data);
+            setErr(error?.response?.data?.message)
         }
+    }
+
+    const handleGoogleAuth = async () => {
+        try {
+            if (!mobile || mobile.trim() === "") {
+                return setErr("Mobile Number is Required");
+            }
+
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            console.log(result);
+            const user = result.user;
+
+            const responce = await axios.post(`${serverUrl}/api/auth/google-auth`, {
+                fullName: user.displayName,
+                email: user.email,
+                mobileNumber: mobile.trim(),
+                role
+            }, { withCredentials: true });
+            console.log(responce);
+            navigate("/");
+
+        } catch (error) {
+            console.log(error);
+            setErr(error?.response?.data?.message)
+        }
+
     }
 
     return (
@@ -69,7 +107,8 @@ function SignUp() {
                         placeholder='Enter your Full Name'
                         style={{ border: `1px solid ${borderColor}` }}
                         onChange={(e) => setFullName(e.target.value)}
-                        value={fullName} />
+                        value={fullName}
+                        required />
                 </div>
 
                 {/* Email */}
@@ -84,7 +123,8 @@ function SignUp() {
                         placeholder='Enter your Email'
                         style={{ border: `1px solid ${borderColor}` }}
                         onChange={(e) => setEmail(e.target.value)}
-                        value={email} />
+                        value={email}
+                        required />
                 </div>
 
                 {/* MobileNumber */}
@@ -99,7 +139,8 @@ function SignUp() {
                         placeholder='Enter your Mobile Number'
                         style={{ border: `1px solid ${borderColor}` }}
                         onChange={(e) => setMobile(e.target.value)}
-                        value={mobile} />
+                        value={mobile}
+                        required />
                 </div>
 
                 {/* Password */}
@@ -115,7 +156,8 @@ function SignUp() {
                             placeholder='Enter your password'
                             style={{ border: `1px solid ${borderColor}` }}
                             onChange={(e) => setPassword(e.target.value)}
-                            value={password} />
+                            value={password}
+                            required />
                         <button
                             type="button"
                             className='absolute right-3 cursor-pointer top-[14px] text-gray-500'
@@ -152,12 +194,21 @@ function SignUp() {
                 <button
                     type="submit"
                     className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
+                    disabled={loading}
                 >
-                    Sign Up
+                    {loading ? <ClipLoader size={20} color="white" /> : "Sign up"}
                 </button>
+                {err && (
+                    <p className='text-red-500 text-center'>
+                        *{err}
+                    </p>
+                )}
 
                 <button
-                    className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'>
+                    type='button'
+                    className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'
+                    onClick={handleGoogleAuth}
+                >
                     <FcGoogle size={20} />
                     <span>Sign Up with Google</span>
                 </button>

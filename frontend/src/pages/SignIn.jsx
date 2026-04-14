@@ -5,6 +5,9 @@ import { FcGoogle } from "react-icons/fc"; // Google
 import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 import { serverUrl } from '../App';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../utils/firebase.js';
+import { ClipLoader } from "react-spinners";
 
 function SignIn() {
 
@@ -17,8 +20,11 @@ function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [err, setErr] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSignIn = async () => {
+        setLoading(true)
         try {
             if (!email || !password) {
                 return alert("Fill all details");
@@ -31,14 +37,37 @@ function SignIn() {
             );
 
             console.log(result);
-
+            setErr("");
+            setLoading(false);
             if (result.status === 200) {
                 navigate("/");
             }
 
         } catch (error) {
-            console.log(error?.response?.data?.message);
+            // console.log(error?.response?.data?.message);
+            setLoading(false);
+            setErr(error?.response?.data?.message)
         }
+    }
+
+    const handleGoogleAuth = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            console.log(result);
+            const user = result.user;
+
+            const responce = await axios.post(`${serverUrl}/api/auth/google-auth`, {
+                email: user.email,
+            }, { withCredentials: true });
+            console.log(responce);
+            setErr("");
+            navigate("/");
+
+        } catch (error) {
+            setErr(error?.response?.data?.message)
+        }
+
     }
 
     return (
@@ -69,7 +98,8 @@ function SignIn() {
                         placeholder='Enter your Email'
                         style={{ border: `1px solid ${borderColor}` }}
                         onChange={(e) => setEmail(e.target.value)}
-                        value={email} />
+                        value={email}
+                        required />
                 </div>
 
                 {/* Password */}
@@ -85,7 +115,8 @@ function SignIn() {
                             placeholder='Enter your password'
                             style={{ border: `1px solid ${borderColor}` }}
                             onChange={(e) => setPassword(e.target.value)}
-                            value={password} />
+                            value={password}
+                            required />
                         <button
                             type="button"
                             className='absolute right-3 cursor-pointer top-[14px] text-gray-500'
@@ -104,12 +135,21 @@ function SignIn() {
                 <button
                     type="submit"
                     className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
+                    disabled={loading}
                 >
-                    Sign In
+                    {loading ? <ClipLoader size={20} color="white" /> : "Sign In"}
                 </button>
+                {err && (
+                    <p className='text-red-500 text-center'>
+                        *{err}
+                    </p>
+                )}
 
                 <button
-                    className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'>
+                    type='button'
+                    className='w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-300 hover:bg-gray-100 cursor-pointer'
+                    onClick={handleGoogleAuth}
+                >
                     <FcGoogle size={20} />
                     <span>Sign In with Google</span>
                 </button>

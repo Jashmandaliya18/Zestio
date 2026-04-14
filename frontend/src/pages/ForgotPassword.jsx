@@ -5,6 +5,7 @@ import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { FaRegEye } from "react-icons/fa"; // open-eye
 import { FaRegEyeSlash } from "react-icons/fa"; // close eye
+import { ClipLoader } from "react-spinners";
 
 function ForgotPassword() {
 
@@ -20,44 +21,68 @@ function ForgotPassword() {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSendOTP = async () => {
+    setLoading(true);
     try {
       const result = await axios.post(`${serverUrl}/api/auth/send-otp`, {
         email
       }, { withCredentials: true });
       console.log(result);
+      setErr("");
+      setLoading(false);
       setStep(2);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+      setErr(error?.response?.data?.message)
     }
   }
 
   const handleVerifyOTP = async () => {
+    setLoading(true);
     try {
       const result = await axios.post(`${serverUrl}/api/auth/verify-otp`, {
         email, otp
       }, { withCredentials: true });
       console.log(result);
+      setErr("");
+      setLoading(false);
       setStep(3);
     } catch (error) {
+      setLoading(false);
       console.log(error);
+      setErr(error?.response?.data?.message)
     }
   }
 
   const handleResetPassword = async () => {
-    if (newPassword != confirmPassword) {
-      return null;
+    setLoading(true);
+    if (!newPassword || !confirmPassword) {
+      setErr("Both password fields are required");
+      setLoading(false);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setErr("Passwords do not match");
+      setLoading(false);
+      return;
     }
     try {
       const result = await axios.post(`${serverUrl}/api/auth/reset-password`, {
         email, newPassword
       }, { withCredentials: true });
       console.log(result);
+      setErr("");
+      setLoading(false);
       navigate("/signin");
     } catch (error) {
+      setLoading(false);
       console.log(error);
+      setErr(error?.response?.data?.message)
     }
   }
 
@@ -82,15 +107,21 @@ function ForgotPassword() {
                 placeholder='Enter your Email'
                 style={{ border: `1px solid ${borderColor}` }}
                 onChange={(e) => setEmail(e.target.value)}
-                value={email} />
+                value={email}
+                required />
             </div>
             <button
               type="submit"
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
-              onClick={handleSendOTP}
+              onClick={handleSendOTP} disabled={loading}
             >
-              Send Otp
+              {loading ? <ClipLoader size={20} color="white" /> : "Send OTP"}
             </button>
+            {err && (
+              <p className='text-red-500 text-center'>
+                *{err}
+              </p>
+            )}
           </div>
         }
 
@@ -106,15 +137,21 @@ function ForgotPassword() {
                 placeholder='Enter your OTP'
                 style={{ border: `1px solid ${borderColor}` }}
                 onChange={(e) => setOtp(e.target.value)}
-                value={otp} />
+                value={otp}
+                required />
             </div>
             <button
               type="submit"
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
-              onClick={handleVerifyOTP}
+              onClick={handleVerifyOTP} disabled={loading}
             >
-              Verify
+              {loading ? <ClipLoader size={20} color="white" /> : "Verify"}
             </button>
+            {err && (
+              <p className='text-red-500 text-center'>
+                *{err}
+              </p>
+            )}
           </div>
         }
 
@@ -132,7 +169,8 @@ function ForgotPassword() {
                   placeholder='Enter your New Password'
                   style={{ border: `1px solid ${borderColor}` }}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  value={newPassword} />
+                  value={newPassword}
+                  required />
                 <button
                   type="button"
                   className='absolute right-3 cursor-pointer top-[14px] text-gray-500'
@@ -152,7 +190,8 @@ function ForgotPassword() {
                   placeholder='Cofirm Password'
                   style={{ border: `1px solid ${borderColor}` }}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  value={confirmPassword} />
+                  value={confirmPassword}
+                  required />
                 <button
                   type="button"
                   className='absolute right-3 cursor-pointer top-[14px] text-gray-500'
@@ -160,14 +199,19 @@ function ForgotPassword() {
                 >{!showConfirmPassword ? <FaRegEye /> : <FaRegEyeSlash />}</button>
               </div>
             </div>
-
             <button
               type="submit"
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer bg-[#ff4d2d] text-white hover:bg-[#e64323]`}
-              onClick={handleResetPassword}
+              onClick={handleResetPassword} disabled={loading}
             >
-              Reset Password
+              {loading ? <ClipLoader size={20} color="white" /> : "Reset Password"}
+
             </button>
+            {err && (
+              <p className='text-red-500 text-center'>
+                *{err}
+              </p>
+            )}
           </div>
         }
 
