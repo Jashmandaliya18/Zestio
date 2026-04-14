@@ -14,12 +14,13 @@ export const signup = async (req, res) => {
         if (user) {
             return res.status(400).json({ message: "User Already Exist with this Email" });
         }
-        if (password.length < 6) {
-            return res.status(400).json({ message: "Password must be at least 6 Characters" });
-        }
         if (mobileNumber.length < 10) {
             return res.status(400).json({ message: "Mobile must be at least 10 digits" });
         }
+        if (password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 Characters" });
+        }
+
         const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -134,8 +135,11 @@ export const sendOTP = async (req, res) => {
 export const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
-        if (!email || !otp) {
-            return res.status(400).json({ message: "Email and OTP are required" });
+        if (!otp) {
+            return res.status(400).json({ message: "OTP is required" });
+        }
+        if (!email) {
+            return res.status(400).json({ message: "Email are required" });
         }
         const user = await User.findOne({ email });
         if (!user) {
@@ -152,7 +156,7 @@ export const verifyOTP = async (req, res) => {
         user.otpExpires = undefined;
         await user.save();
 
-        return res.status(200).json({ message: "OTP Verifu Successfully" });
+        return res.status(200).json({ message: "OTP Verify Successfully" });
 
     } catch (error) {
         return res.status(500).json(`Verify OTP error ${error}`);
@@ -162,6 +166,8 @@ export const verifyOTP = async (req, res) => {
 export const resetPassword = async (req, res) => {
     try {
         const { email, newPassword } = req.body;
+        if (!email) return res.status(400).json({ message: "Email is Required" });
+        if (!newPassword) return res.status(400).json({ message: "Password is Required" });
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "User does not Exist" });
@@ -179,5 +185,68 @@ export const resetPassword = async (req, res) => {
         return res.status(200).json({ message: "Password Reset Successfully" });
     } catch (error) {
         return res.status(500).json(`Reset Password error ${error}`);
+    }
+}
+
+export const googleAuth = async (req, res) => {
+    try {
+        const { fullName, email, mobileNumber, role } = req.body;
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            const token = await getToken(user._id);
+
+            res.cookie("token", token, {
+                secure: false,
+                sameSite: "strict",
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            });
+
+            return res.status(200).json({
+                message: "Login Successful",
+                user: {
+                    _id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                }
+            });
+        }
+
+        if (!fullName || !mobileNumber || !role) {
+            return res.status(400).json({
+                message: "Complete signup first (mobile & role required)"
+            });
+        }
+
+        user = await User.create({
+            fullName,
+            email,
+            mobileNumber,
+            role,
+        });
+
+        const token = await getToken(user._id);
+
+        res.cookie("token", token, {
+            secure: false,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+        });
+
+        return res.status(201).json({
+            message: "Signup Successful",
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+            }
+        });
+
+    } catch (error) {
+        console.log("Google Auth Error:", error);
+        return res.status(500).json({ message: error.message });
     }
 }
