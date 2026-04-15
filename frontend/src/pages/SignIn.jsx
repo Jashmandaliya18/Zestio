@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { FaRegEye } from "react-icons/fa"; // open-eye
 import { FaRegEyeSlash } from "react-icons/fa"; // close eye
 import { FcGoogle } from "react-icons/fc"; // Google
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import axios from "axios"
 import { serverUrl } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../utils/firebase.js';
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/user.slice.js';
 
 function SignIn() {
 
@@ -23,6 +25,8 @@ function SignIn() {
     const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const dispatch = useDispatch();
+
     const handleSignIn = async () => {
         setLoading(true)
         try {
@@ -35,13 +39,10 @@ function SignIn() {
                 { email, password },
                 { withCredentials: true }
             );
-
+            dispatch(setUserData(result.data.user));
             console.log(result);
             setErr("");
             setLoading(false);
-            if (result.status === 200) {
-                navigate("/");
-            }
 
         } catch (error) {
             // console.log(error?.response?.data?.message);
@@ -60,9 +61,9 @@ function SignIn() {
             const responce = await axios.post(`${serverUrl}/api/auth/google-auth`, {
                 email: user.email,
             }, { withCredentials: true });
-            console.log(responce);
+            dispatch(setUserData(responce.data.user));
+            console.log(responce.data);
             setErr("");
-            navigate("/");
 
         } catch (error) {
             setErr(error?.response?.data?.message)
