@@ -47,6 +47,7 @@ export const signup = async (req, res) => {
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 email: newUser.email,
+                role: newUser.role,
             }
         })
 
@@ -88,6 +89,7 @@ export const signIn = async (req, res) => {
                 _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                role: user.role,
             }
         })
 
@@ -210,6 +212,7 @@ export const googleAuth = async (req, res) => {
                     _id: user._id,
                     fullName: user.fullName,
                     email: user.email,
+                    role: user.role,
                 }
             });
         }
@@ -242,6 +245,7 @@ export const googleAuth = async (req, res) => {
                 _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                role: user.role,
             }
         });
 
