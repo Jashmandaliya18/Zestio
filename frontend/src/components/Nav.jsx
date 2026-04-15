@@ -3,18 +3,31 @@ import { FaLocationDot } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 import { GrCart } from "react-icons/gr";
 import { IoIosClose } from "react-icons/io";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { serverUrl } from '../App';
+import { setUserData } from '../redux/user.slice';
 
 function Nav() {
     const { userData, city } = useSelector(state => state.user);
     const [showInfo, setShowInfo] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
+    const dispatch = useDispatch();
+    const handleLogOut = async () => {
+        try {
+            const result = await axios.get(`${serverUrl}/api/auth/signout`, { withCredentials: true });
+            dispatch(setUserData(null));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className='w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-[#fff9f6] overflow-hidden'>
 
             {showSearch &&
                 <div className='w-[90%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] flex fixed top-[80px] left-[5%]'>
-                    <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
+                    <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400 md:hidden'>
                         <FaLocationDot size={20} className='text-[#ff4d2d]' />
                         <div className='w-[80%] truncate text-gray-600'>{city}</div>
                     </div>
@@ -61,7 +74,7 @@ function Nav() {
                     <div className='fixed top-[80px] right-[10px] md:right-[10%] lg:right-[20%] w-[180px] bg-white shadow-2xl rounded-xl p-[20px] flex flex-col gap-[10px] z-[9999]'>
                         <div className='text-[17px] font-semibold'>{userData.fullName}</div>
                         <div className='md:hidden text-[#ff4d2d] font-semibold cursor-pointer'>My Orders</div>
-                        <div className='text-[#ff4d2d] font-semibold cursor-pointer'>Logout</div>
+                        <div className='text-[#ff4d2d] font-semibold cursor-pointer' onClick={handleLogOut}>Logout</div>
                     </div>}
             </div>
         </div >
