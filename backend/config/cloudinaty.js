@@ -14,6 +14,7 @@ const uploadCloudinary = async (file) => {
     } catch (error) {
         await fs.unlinkSync(file);
         console.log(error);
+        return res.status(500).json({ message: `Error in Image Uplaoding: ${error}` });
     }
 }
 export default uploadCloudinary;
