@@ -1,11 +1,11 @@
-import uploadCloudinary from "../config/cloudinaty";
-import Item from "../models/item.model";
-import Shop from "../models/shop.model";
+import uploadCloudinary from "../config/cloudinary.js";
+import Item from "../models/item.model.js";
+import Shop from "../models/shop.model.js";
 
 
 export const addItem = async (req, res) => {
     try {
-        const { name, category, category, foodType } = req.body;
+        const { name, category, price, foodType } = req.body;
         if (!name) {
             return res.status(400).json({ message: "Item name is Required" });
         }

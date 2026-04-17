@@ -1,7 +1,7 @@
-import uploadCloudinary, { } from "../config/cloudinaty.js"
+import uploadCloudinary, { } from "../config/cloudinary.js"
 import Shop from "../models/shop.model.js";
 
-export const createAndEditShop = async (req, req) => {
+export const createAndEditShop = async (req, res) => {
     try {
         const { name, city, state, address } = req.body;
         if (!name) {
