@@ -45,13 +45,13 @@ export const createAndEditShop = async (req, res) => {
             }, { new: true })
         }
 
-        await newShop.populate("owner");
+        await shop.populate("owner");
         return res.status(201).json({
             message: "New Shop Created Successfully",
-            newShop: {
-                _id: newShop._id,
-                name: newShop.name,
-                owner: newShop.owner,
+            shop: {
+                _id: shop._id,
+                name: shop.name,
+                owner: shop.owner,
             }
         });
 
@@ -64,7 +64,7 @@ export const createAndEditShop = async (req, res) => {
 
 export const getMyShop = async (req, res) => {
     try {
-        const shop = Shop.findOne({ owner: req.user._id }).populate("owner items");
+        const shop = await Shop.findOne({ owner: req.user._id }).populate("owner items");
         if (!shop) {
             return res.status(400).json({ message: "Shop is not Found" });
         }

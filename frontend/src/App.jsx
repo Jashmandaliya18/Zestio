@@ -7,12 +7,14 @@ import useGetCurrentUser from './hooks/useGetCurrentUser'
 import { useSelector } from 'react-redux'
 import Home from './pages/Home'
 import useGetCity from './hooks/useGetCity'
+import useGetMyShop from './hooks/useGetMyShop'
 
 export const serverUrl = "http://localhost:8000";
 
 function App() {
   useGetCurrentUser();
   useGetCity();
+  useGetMyShop();
   const { userData } = useSelector(state => state.user);
 
   return (

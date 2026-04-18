@@ -12,5 +12,5 @@ const ownerSlice = createSlice({
     }
 })
 
-export const { myShopData} = ownerSlice.actions;
+export const { setMyShopData} = ownerSlice.actions;
 export default ownerSlice.reducer;
