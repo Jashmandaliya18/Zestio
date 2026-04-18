@@ -8,6 +8,7 @@ import axios from 'axios';
 import { serverUrl } from '../App';
 import { setUserData } from '../redux/user.slice';
 import { FaPlus } from "react-icons/fa6";
+import { MdOutlineInventory2 } from "react-icons/md";
 
 function Nav() {
     const { userData, city } = useSelector(state => state.user);
@@ -64,26 +65,40 @@ function Nav() {
                     <IoIosSearch size={25} className='text-[#ff4d2d] md:hidden' onClick={() => setShowSearch(true)} />)
                 }
 
-                {userData.role == 'owner' &&
+                {userData.role == 'owner' ?
                     <>
                         <button className='hidden md:flex items-center justify-center gap-1 p-1 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
-                            <FaPlus size={11} /> <span>Add Order</span>
+                            <FaPlus size={20} /> <span>Add Food Item</span>
                         </button>
-                        <button className='md:hidden flex items-center justify-center gap-1 p-1 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
-                            <FaPlus size={11} /> <span>Add</span>
+                        <button className='md:hidden flex items-center justify-center gap-1 p-1 cursor-pointer rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d]'>
+                            <FaPlus size={20} />
                         </button>
+                        <div className='hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
+                            <MdOutlineInventory2 size={20} />
+                            <span>My Orders</span>
+                            <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px] '>0</span>
+                        </div>
+
+                        <div className='md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
+                            <MdOutlineInventory2 size={20} />
+                            <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[6px] py-[1px] '>0</span>
+                        </div>
                     </>
+                    :
+                    (
+                        <>
+                            <div className='relative cursor-pointer'>
+                                <GrCart size={20} className='text-[#ff4d2d]' />
+                                <span className='absolute right-[-7px] top-[-13px] text-[#ff4d2d]'>0</span>
+                            </div>
+
+                            <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium cursor-pointer'>
+                                My Orders
+                            </button>
+                        </>
+                    )
                 }
 
-                {userData.role == "user" &&
-                    <div className='relative cursor-pointer'>
-                        <GrCart size={20} className='text-[#ff4d2d]' />
-                        <span className='absolute right-[-7px] top-[-13px] text-[#ff4d2d]'>0</span>
-                    </div>
-                }
-                <button className='hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium cursor-pointer'>
-                    My Orders
-                </button>
                 <div className='w-[30px] rounded-full flex items-center justify-center bg-[#ff4d2d] text-white text-[20px] shadow-xl font-semibold cursor-pointer' onClick={() => setShowInfo(prev => !prev)}>
                     {userData?.fullName?.slice(0, 1)}
                 </div>
