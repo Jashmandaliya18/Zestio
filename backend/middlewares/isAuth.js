@@ -13,7 +13,7 @@ export const isAuth = async (req, res, next) => {
             return res.status(400).json({ message: "Token not Verify" });
         }
         console.log(decodeToken);
-        req.userId = decodeToken.userId;
+        req.user = { _id: decodeToken.userId };
         next();
 
     } catch (error) {

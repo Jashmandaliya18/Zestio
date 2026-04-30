@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary'
-import fs, { unlinkSync } from 'fs'
+import fs from 'fs'
 
 const uploadCloudinary = async (file) => {
     cloudinary.config({
@@ -7,15 +7,26 @@ const uploadCloudinary = async (file) => {
         api_key: process.env.CLOUDINARY_API_KEY,
         api_secret: process.env.CLOUDINARY_API_SECRET
     });
+
     try {
-        const result = cloudinary.uploader.upload(file);
-        await fs.unlinkSync(file);
+        if (!file || !file.path) {
+            throw new Error("File path missing");
+        }
+
+        const result = await cloudinary.uploader.upload(file.path);
+
+        fs.unlinkSync(file.path);
+
         return result.secure_url;
+
     } catch (error) {
-        await fs.unlinkSync(file);
+        if (file && file.path) {
+            fs.unlinkSync(file.path);
+        }
         console.log(error);
-        return res.status(500).json({ message: `Error in Image Uplaoding: ${error}` });
+        throw error;
     }
 }
+
 export default uploadCloudinary;
 

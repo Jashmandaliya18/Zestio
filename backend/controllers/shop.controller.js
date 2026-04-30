@@ -19,8 +19,10 @@ export const createAndEditShop = async (req, res) => {
 
         let image;
         if (req.file) {
-            image = await uploadCloudinary(req.file.path);
+            image = await uploadCloudinary(req.file);
         }
+        console.log("REQ FILE ->", req.file);
+
         if (!image) {
             return res.status(400).json({ message: "Shop image is required" });
         }

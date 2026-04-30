@@ -11,7 +11,7 @@ import { FaPlus } from "react-icons/fa6";
 import { MdOutlineInventory2 } from "react-icons/md";
 
 function Nav() {
-    const { userData, city } = useSelector(state => state.user);
+    const { userData, currentCity } = useSelector(state => state.user);
     const { myShopData } = useSelector(state => state.owner);
     const [showInfo, setShowInfo] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
@@ -32,7 +32,7 @@ function Nav() {
                 <div className='w-[90%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] flex fixed top-[80px] left-[5%]'>
                     <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400 md:hidden'>
                         <FaLocationDot size={20} className='text-[#ff4d2d]' />
-                        <div className='w-[80%] truncate text-gray-600'>{city}</div>
+                        <div className='w-[80%] truncate text-gray-600'>{currentCity}</div>
                     </div>
                     <div className='w-[80%] flex items-center gap-[10px]'>
                         <IoIosSearch size={25} className='text-[#ff4d2d]' />
@@ -50,7 +50,7 @@ function Nav() {
                 <div className='md:w-[60%] lg:w-[40%] h-[70px] bg-white shadow-xl rounded-lg items-center gap-[20px] hidden md:flex'>
                     <div className='flex items-center w-[30%] overflow-hidden gap-[10px] px-[10px] border-r-[2px] border-gray-400'>
                         <FaLocationDot size={20} className='text-[#ff4d2d]' />
-                        <div className='w-[80%] truncate text-gray-600'>{city}</div>
+                        <div className='w-[80%] truncate text-gray-600'>{currentCity}</div>
                     </div>
                     <div className='w-[80%] flex items-center gap-[10px]'>
                         <IoIosSearch size={25} className='text-[#ff4d2d]' />
